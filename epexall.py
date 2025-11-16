@@ -292,7 +292,8 @@ st.caption(
     "Per marktgebied wordt eerst 15-min Day-Ahead geprobeerd; als dat niet lukt, "
     "worden 60-min prijzen naar 96 kwartieren opgeschaald."
 )
-
+tz = ZoneInfo("Europe/Amsterdam")
+now = datetime.now(tz)
 today = date.today()
 tomorrow = today + timedelta(days=1)
 
