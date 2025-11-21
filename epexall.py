@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 import altair as alt
 from entsoe import EntsoePandasClient
+import yfinance as yf
 
 # ----------------- Config -----------------
 
@@ -85,6 +86,39 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
     df = df[df['q'] <= 96] # Safety check
     
     return df[["q", "price"]]
+
+
+@st.cache_data(show_spinner=False)
+def get_gas_prices(days: int = 30) -> pd.DataFrame:
+    """
+    Fetches Dutch TTF Gas prices (TTF=F) for the last 'days' days using yfinance.
+    Returns a DataFrame with Date and Close price columns.
+    """
+    try:
+        # Fetch TTF=F (Dutch TTF Natural Gas Calendar Month Futures)
+        ticker = yf.Ticker("TTF=F")
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        
+        # Get historical data
+        hist = ticker.history(start=start_date, end=end_date)
+        
+        if hist.empty:
+            return pd.DataFrame(columns=["Date", "Price"])
+        
+        # Prepare dataframe
+        df = hist[['Close']].copy()
+        df = df.reset_index()
+        df.columns = ['Date', 'Price']
+        df['Date'] = pd.to_datetime(df['Date']).dt.date
+        
+        # Sort by date to ensure chronological order
+        df = df.sort_values('Date').reset_index(drop=True)
+        
+        return df
+    except Exception:
+        # Error fetching data
+        return pd.DataFrame(columns=["Date", "Price"])
 
 
 # ----------------- Streamlit dashboard -----------------
@@ -271,6 +305,52 @@ st.download_button(
     file_name=f"Entsoe_DayAhead_quarters_all_markets_{selected_date}.csv",
     mime="text/csv",
 )
+
+# ---- Dutch Gas Price Section ----
+st.subheader("Dutch Gas Price (TTF) Development – Last 30 Days")
+st.caption(
+    "Source: Yahoo Finance (TTF=F). "
+    "Shows the Dutch TTF Natural Gas Calendar Month Futures price trend."
+)
+
+with st.spinner("Fetching gas prices..."):
+    gas_df = get_gas_prices(days=30)
+
+if gas_df.empty:
+    st.warning("No gas price data available for the selected period.")
+else:
+    # Convert Date to datetime for Altair
+    gas_df['Date'] = pd.to_datetime(gas_df['Date'])
+    
+    # Create gas price chart
+    gas_chart = alt.Chart(gas_df).mark_line(
+        point=True,
+        strokeWidth=2,
+        color='#FF6B6B'
+    ).encode(
+        x=alt.X('Date:T', title='Date', axis=alt.Axis(format='%b %d')),
+        y=alt.Y('Price:Q', title='Price (€/MWh)'),
+        tooltip=[
+            alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
+            alt.Tooltip('Price:Q', title='Price (€/MWh)', format='.2f')
+        ]
+    ).properties(
+        width='container',
+        height=350
+    )
+    
+    st.altair_chart(gas_chart, use_container_width=True)
+    
+    # Show some basic statistics
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Average Price", f"€{gas_df['Price'].mean():.2f}/MWh")
+    with col2:
+        st.metric("Min Price", f"€{gas_df['Price'].min():.2f}/MWh")
+    with col3:
+        st.metric("Max Price", f"€{gas_df['Price'].max():.2f}/MWh")
+    with col4:
+        st.metric("Latest Price", f"€{gas_df['Price'].iloc[-1]:.2f}/MWh")
 
 if skipped_markets:
     st.caption(
