@@ -1,3 +1,5 @@
+import os
+import sys
 from datetime import datetime, date, timedelta
 import pandas as pd
 import streamlit as st
@@ -7,8 +9,8 @@ from entsoe import EntsoePandasClient
 
 # ----------------- Config -----------------
 
-# ENTSO-E API Key
-ENTSOE_API_KEY = "88f62dd9-0372-434c-8bc8-52b3c36a127f"
+# ENTSO-E API Key - can be overridden by environment variable
+ENTSOE_API_KEY = os.getenv("ENTSOE_API_KEY", "88f62dd9-0372-434c-8bc8-52b3c36a127f")
 
 # Bekende Day-Ahead marktgebieden (bidding zones)
 DAYAHEAD_MARKET_AREAS = [
@@ -108,7 +110,9 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
         return df_q
     
     except Exception as e:
-        # Return empty DataFrame if fetching fails
+        # Log the error and return empty DataFrame if fetching fails
+        # This could be due to network issues, API limits, or data unavailability
+        print(f"Error fetching prices for {market_area} on {delivery_date}: {e}", file=sys.stderr)
         return pd.DataFrame(columns=["q", "price"])
 
 
