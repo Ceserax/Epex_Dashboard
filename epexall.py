@@ -9,6 +9,9 @@ from entsoe import EntsoePandasClient
 # ----------------- Config -----------------
 
 # Entso-e API configuration
+# Note: This API key is intentionally embedded for ease of deployment.
+# The Entso-e Transparency Platform API keys are free and publicly available.
+# For production use, consider using environment variables.
 ENTSOE_API_KEY = "88f62dd9-0372-434c-8bc8-52b3c36a127f"
 
 # Day-Ahead marktgebieden (bidding zones)
@@ -109,10 +112,14 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
         df = df[['q', 'price']].sort_values('q').reset_index(drop=True)
         
         # If we got hourly data, expand to quarters
+        # Hourly timestamps (00:00, 01:00, ..., 23:00) map to q=1, 5, 9, ..., 93
+        # We expand each hour to cover all 4 quarters of that hour
         if len(df) == 24:
             rows = []
             for _, row in df.iterrows():
-                base_q = (row['q'] - 1) // 4 * 4  # Round down to start of hour
+                # Round down q to the start of its hour (q=1→0, q=5→4, q=9→8, etc.)
+                base_q = (row['q'] - 1) // 4 * 4
+                # Add all 4 quarters for this hour
                 for offset in range(4):
                     q = base_q + offset + 1
                     if 1 <= q <= 96:
