@@ -308,7 +308,7 @@ st.markdown(
     """
 **Legenda / verklaring:**
 
-- Elke **kleur** staat voor een ander *marktgebied* op EPEX Spot.  
+- Elke **kleur** staat voor een ander *marktgebied*.  
 - De **lichte verticale lijnen** geven elke 15-minuutperiode (kwartier) aan.  
 - De **donkere verticale lijnen** markeren de **uren** (1h, 2h, ..., 24h), en deze uren staan ook op de x-as.  
 - Door in de **legenda** op een marktgebied te klikken kun je lijnen verbergen of juist accentueren.  
