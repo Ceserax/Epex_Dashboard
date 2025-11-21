@@ -1,7 +1,6 @@
 streamlit>=1.39
 pandas>=2.0
 requests>=2.31
-beautifulsoup4>=4.12
 urllib3>=2.2
 altair>=5.0
-lxml>=5.0
+entsoe-py>=0.5.0
