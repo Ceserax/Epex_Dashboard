@@ -1,0 +1,16 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting entsoe-py
+  Downloading entsoe_py-0.7.8-py3-none-any.whl.metadata (12 kB)
+Requirement already satisfied: requests in /usr/lib/python3/dist-packages (from entsoe-py) (2.31.0)
+Requirement already satisfied: pytz in /usr/lib/python3/dist-packages (from entsoe-py) (2024.1)
+Requirement already satisfied: beautifulsoup4>=4.11.1 in /home/runner/.local/lib/python3.12/site-packages (from entsoe-py) (4.14.2)
+Requirement already satisfied: pandas>=2.2.0 in /home/runner/.local/lib/python3.12/site-packages (from entsoe-py) (2.3.3)
+Requirement already satisfied: soupsieve>1.2 in /home/runner/.local/lib/python3.12/site-packages (from beautifulsoup4>=4.11.1->entsoe-py) (2.8)
+Requirement already satisfied: typing-extensions>=4.0.0 in /usr/lib/python3/dist-packages (from beautifulsoup4>=4.11.1->entsoe-py) (4.10.0)
+Requirement already satisfied: numpy>=1.26.0 in /home/runner/.local/lib/python3.12/site-packages (from pandas>=2.2.0->entsoe-py) (2.3.5)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/lib/python3/dist-packages (from pandas>=2.2.0->entsoe-py) (2.8.2)
+Requirement already satisfied: tzdata>=2022.7 in /home/runner/.local/lib/python3.12/site-packages (from pandas>=2.2.0->entsoe-py) (2025.2)
+Downloading entsoe_py-0.7.8-py3-none-any.whl (1.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.6/1.6 MB 41.9 MB/s eta 0:00:00
+Installing collected packages: entsoe-py
+Successfully installed entsoe-py-0.7.8
