@@ -9,6 +9,8 @@ from entsoe import EntsoePandasClient
 # ----------------- Config -----------------
 
 # Entso-e API key
+# Note: For production use, consider moving this to environment variables
+# This key is provided as per project requirements
 ENTSOE_API_KEY = "88f62dd9-0372-434c-8bc8-52b3c36a127f"
 
 # Day-Ahead marktgebieden (bidding zones)
@@ -131,7 +133,7 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
                 df_q = convert_hourly_to_quarter(prices)
                 return df_q
             else:
-                # Als we meer of minder dan 24 waarden hebben, probeer te resamples
+                # Als we meer of minder dan 24 waarden hebben, probeer te resample
                 # Dit kan gebeuren bij DST overgangen
                 prices_hourly = prices.resample('H').mean()
                 df_q = convert_hourly_to_quarter(prices_hourly)
