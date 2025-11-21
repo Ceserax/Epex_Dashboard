@@ -112,6 +112,9 @@ def get_gas_prices(days: int = 30) -> pd.DataFrame:
         df.columns = ['Date', 'Price']
         df['Date'] = pd.to_datetime(df['Date']).dt.date
         
+        # Sort by date to ensure chronological order
+        df = df.sort_values('Date').reset_index(drop=True)
+        
         return df
     except Exception:
         # Error fetching data
