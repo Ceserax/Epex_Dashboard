@@ -170,8 +170,8 @@ selected_date = st.date_input(
     min_value=today - timedelta(days=7),
     max_value=tomorrow,
     help=(
-        "Morgen werkt zodra de EPEX day-ahead tabel gepubliceerd is "
-        "(rond 12:45-13:15)."
+        "Morgen werkt zodra de Day-Ahead prijzen gepubliceerd zijn "
+        "via de Entso-e API (rond 12:45-13:15)."
     ),
 )
 
@@ -314,11 +314,11 @@ st.markdown(
     """
 **Legenda / verklaring:**
 
-- Elke **kleur** staat voor een ander *marktgebied* op EPEX Spot.  
+- Elke **kleur** staat voor een ander *marktgebied*.  
 - De **lichte verticale lijnen** geven elke 15-minuutperiode (kwartier) aan.  
 - De **donkere verticale lijnen** markeren de **uren** (1h, 2h, ..., 24h), en deze uren staan ook op de x-as.  
 - Door in de **legenda** op een marktgebied te klikken kun je lijnen verbergen of juist accentueren.  
-- Als een markt alleen uurprijzen heeft, worden die **naar 96 kwartieren verdeeld** (zelfde prijs in de 4 kwartieren van dat uur).
+- De Entso-e API levert uurprijzen die **naar 96 kwartieren worden verdeeld** (zelfde prijs in de 4 kwartieren van dat uur).
 """
 )
 
