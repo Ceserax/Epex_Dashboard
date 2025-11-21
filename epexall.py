@@ -9,10 +9,13 @@ from entsoe import EntsoePandasClient
 
 # ----------------- Config -----------------
 
-# ENTSO-E API Key - can be overridden by environment variable
+# ENTSO-E API Key - set via ENTSOE_API_KEY environment variable
+# For development/testing, a default key is provided
+# In production, always use environment variable to avoid exposing keys in source control
 ENTSOE_API_KEY = os.getenv("ENTSOE_API_KEY", "88f62dd9-0372-434c-8bc8-52b3c36a127f")
 
 # Bekende Day-Ahead marktgebieden (bidding zones)
+# Note: Some markets may have limited data availability depending on ENTSO-E coverage
 DAYAHEAD_MARKET_AREAS = [
     "NL",
     "BE",
@@ -20,7 +23,6 @@ DAYAHEAD_MARKET_AREAS = [
     "AT",
     "FR",
     "CH",
-    "GB",
     "PL",
     "DK_1",
     "DK_2",
@@ -102,7 +104,10 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
         # Check the frequency of the data
         # If we have ~96 data points, it's 15-minute data
         # If we have ~24 data points, it's hourly data
-        if len(prices) >= 90:  # 15-minute data (allowing for some variation)
+        # Threshold of 90 allows for some missing data points while still identifying 15-min data
+        # (expected 96 quarters, but allowing up to 6 missing points)
+        QUARTER_DATA_THRESHOLD = 90
+        if len(prices) >= QUARTER_DATA_THRESHOLD:  # 15-minute data
             df_q = convert_15min_to_quarters(prices)
         else:  # Hourly data, expand to quarters
             df_q = convert_hourly_to_quarters(prices)
