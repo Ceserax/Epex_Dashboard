@@ -9,6 +9,7 @@ from entsoe.mappings import Area
 # ----------------- Config -----------------
 
 # ENTSO-E API key
+# Note: In production, this should be moved to an environment variable
 ENTSOE_API_KEY = "88f62dd9-0372-434c-8bc8-52b3c36a127f"
 
 # Day-Ahead marktgebieden (bidding zones) met mapping naar ENTSO-E codes
@@ -99,7 +100,8 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
             return pd.DataFrame(columns=["q", "price"])
         
         # Stel start en eind tijden in (hele dag)
-        # ENTSO-E gebruikt UTC, maar we willen lokale tijd voor de bidding zone
+        # We gebruiken Europe/Brussels als standaard timezone voor alle markten
+        # Dit is correct voor de meeste Europese markten (CET/CEST timezone)
         start = pd.Timestamp(delivery_date, tz='Europe/Brussels')
         end = start + pd.Timedelta(days=1)
         
@@ -110,8 +112,9 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
         df_q = convert_series_to_quarters(prices)
         return df_q
         
-    except Exception as e:
+    except Exception:
         # Bij fouten (API down, geen data, etc.) geef lege DataFrame terug
+        # Streamlit toont geen specifieke foutmeldingen om de UX eenvoudig te houden
         return pd.DataFrame(columns=["q", "price"])
 
 
