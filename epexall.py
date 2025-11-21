@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
 
@@ -10,6 +11,7 @@ from entsoe.mappings import Area
 # ----------------- Config -----------------
 
 # Entso-e API Key
+# Note: In production, this should be moved to environment variables or secure configuration
 ENTSOE_API_KEY = "88f62dd9-0372-434c-8bc8-52b3c36a127f"
 
 # Bekende Day-Ahead marktgebieden (bidding zones)
@@ -131,6 +133,8 @@ def get_day_ahead_prices(delivery_date: date, market_area: str) -> pd.DataFrame:
         return df_q
         
     except Exception as e:
+        # Log de fout voor debugging (in Streamlit console)
+        print(f"Error fetching data for {market_area} on {delivery_date}: {type(e).__name__}: {e}", file=sys.stderr)
         # Bij fouten, retourneer leeg dataframe
         return pd.DataFrame(columns=["q", "price"])
 
