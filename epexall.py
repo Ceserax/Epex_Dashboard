@@ -107,7 +107,7 @@ tomorrow = today + timedelta(days=1)
 # Date selection
 selected_date = st.date_input(
     "Choose delivery date",
-    value=tomorrow if datetime.now().hour >= 13 else today,
+    value=tomorrow,  # <--- CHANGED: Always default to tomorrow
     min_value=today - timedelta(days=7),
     max_value=tomorrow,
     help=(
@@ -115,7 +115,6 @@ selected_date = st.date_input(
         "(usually around 13:00)."
     ),
 )
-
 with st.spinner(f"Fetching prices for delivery day {selected_date}..."):
     all_frames: list[pd.DataFrame] = []
     skipped_markets: list[str] = []
