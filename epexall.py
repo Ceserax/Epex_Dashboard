@@ -43,6 +43,11 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
     """
     Fetches Day-Ahead prices via Entso-E API and converts them to
     a quarter-hourly profile (q=1..96).
+
+    Note for DE-LU: The ENTSO-E API may return multiple sequences of price data.
+    Sequence 1 contains SDAC (Single Day Ahead Coupling) prices with Gate Closure
+    12:00 CE(S)T D-1. In case of decoupling, local prices may vary from SDAC prices.
+    This function keeps only Sequence 1 (first occurrence) for consistency.
     """
     client = EntsoePandasClient(api_key=API_KEY)
     
@@ -66,6 +71,20 @@ def get_dayahead_quarter_prices(delivery_date: date, market_area: str) -> pd.Dat
 
     if series.empty:
         return pd.DataFrame(columns=["q", "price"])
+
+    # Handle multiple sequences (e.g., for DE-LU the API may return multiple auction sequences)
+    # If returned as DataFrame, take the first column (Sequence 1 = SDAC prices)
+    if isinstance(series, pd.DataFrame):
+        if series.shape[1] > 0:
+            series = series.iloc[:, 0]
+        else:
+            return pd.DataFrame(columns=["q", "price"])
+
+    # Remove any duplicate timestamps by keeping only the first value
+    # This ensures we use Sequence 1 (SDAC) prices for areas like DE-LU
+    duplicated_mask = series.index.duplicated()
+    if duplicated_mask.any():
+        series = series[~duplicated_mask]
 
     # Convert to DataFrame
     df = series.to_frame(name="price")
@@ -98,7 +117,8 @@ st.title("Entso-e Day-Ahead Dashboard – All Available Countries")
 st.caption(
     "Source: Entso-E Transparency Platform. "
     "Day-Ahead prices are fetched per market area. Hourly prices are automatically "
-    "converted to 4 identical quarter prices."
+    "converted to 4 identical quarter prices. "
+    "For DE-LU: SDAC prices from Sequence 1 (Gate Closure 12:00 CE(S)T D-1) are used."
 )
 tz = ZoneInfo("Europe/Amsterdam")
 today = date.today()
@@ -230,6 +250,7 @@ st.markdown(
 - The **light vertical lines** indicate every 15-minute period (quarter).  
 - The **dark vertical lines** mark the **hours** (1h, 2h, ..., 24h).  
 - Click in the **legend** on a market area to filter.
+- **DE-LU note:** Shows SDAC (Single Day Ahead Coupling) prices from Sequence 1. In case of decoupling, local prices may vary.
 """
 )
 
