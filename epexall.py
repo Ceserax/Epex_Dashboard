@@ -9,7 +9,7 @@ from entsoe import EntsoePandasClient
 
 # ----------------- Config -----------------
 
-API_KEY = '88f62dd9-0372-434c-8bc8-52b3c36a127f'
+API_KEY = st.secrets["ENTSOE_API_KEY"]
 
 # Day-Ahead market areas (Entso-E naming convention mapped below)
 DAYAHEAD_MARKET_AREAS = [
