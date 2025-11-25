@@ -9,7 +9,16 @@ from entsoe import EntsoePandasClient
 
 # ----------------- Config -----------------
 
-API_KEY = '88f62dd9-0372-434c-8bc8-52b3c36a127f'
+if "ENTSOE_API_KEY" not in st.secrets:
+    st.error(
+        "ENTSO-E API key not found. Please configure your API key:\n\n"
+        "1. Copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml`\n"
+        "2. Add your ENTSO-E API key to the secrets file\n\n"
+        "For Streamlit Cloud, add the secret in your app settings."
+    )
+    st.stop()
+
+API_KEY = st.secrets["ENTSOE_API_KEY"]
 
 # Day-Ahead market areas (Entso-E naming convention mapped below)
 DAYAHEAD_MARKET_AREAS = [
